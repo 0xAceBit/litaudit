@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import litauditLogo from "@/assets/litaudit-logo.png";
 import { LITVM_EXPLORER, contractAddressSchema, riskMeta, severityMeta, shortAddress, type AuditResult, type RiskLevel } from "@/lib/litaudit";
 import { scanContract } from "@/lib/litaudit.functions";
 import { cn } from "@/lib/utils";
@@ -62,9 +63,7 @@ function Index() {
       <header className="border-b border-border/70 bg-card/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5 sm:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-md border border-primary/40 bg-primary/10 text-primary shadow-[var(--shadow-signal)]">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-            </div>
+            <img src={litauditLogo} alt="LitAudit logo" className="size-12 rounded-md object-cover shadow-[var(--shadow-signal)]" />
             <div>
               <p className="text-xl font-bold leading-tight tracking-normal text-primary">LitAudit</p>
               <p className="text-xs font-semibold text-muted-foreground">Security Intelligence for LitVM</p>
