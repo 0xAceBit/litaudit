@@ -117,7 +117,7 @@ function Index() {
               <div className="flex min-h-[420px] flex-col justify-between gap-8">
                 <div>
                   <div className="mb-6 flex size-12 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary">
-                    <FileCode2 className="size-6" aria-hidden="true" />
+                    <ShieldCheck className="size-6" aria-hidden="true" />
                   </div>
                   <h2 className="text-2xl font-bold tracking-normal">Ready for first scan</h2>
                   <p className="mt-3 leading-7 text-muted-foreground">Paste a LitVM token contract address to inspect ERC-20 metadata, bytecode, ownership controls, and available external security signals.</p>
@@ -144,7 +144,7 @@ function Index() {
 
       <section className="mx-auto grid max-w-7xl gap-6 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_1fr_1fr]">
         <InfoCard icon={<ShieldCheck className="size-5" />} title="Automated risk scoring" copy="Weighted findings surface critical, high, medium, and low signals with an actionable score." />
-        <InfoCard icon={<Zap className="size-5" />} title="Live LitVM reads" copy="Contract metadata and bytecode are fetched from the LitVM testnet RPC through server-side analysis." />
+        <InfoCard icon={<Search className="size-5" />} title="Live LitVM reads" copy="Contract metadata and bytecode are fetched from the LitVM testnet RPC through server-side analysis." />
         <InfoCard icon={<Radar className="size-5" />} title="Scan history" copy="Recent scans stay ready in this session so you can compare contracts quickly." />
       </section>
 
