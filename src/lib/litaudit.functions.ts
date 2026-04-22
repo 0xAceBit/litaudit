@@ -24,6 +24,12 @@ const ERC20_SELECTORS = {
   blacklist: "0x44337ea1",
 };
 
+type RawOnmiTokenData = OnmiTokenData & {
+  uriData?: {
+    image?: unknown;
+  };
+};
+
 async function rpcCall(method: string, params: unknown[]) {
   const response = await fetch(LITVM_RPC, {
     method: "POST",
@@ -114,7 +120,19 @@ async function tryOnmiTokenData(address: string): Promise<OnmiTokenData | null> 
     if (!response.ok) return null;
     const data = await response.json();
     const tokens = Array.isArray(data.token) ? data.token : [];
-    return tokens.find((token: OnmiTokenData) => token.address?.toLowerCase() === address.toLowerCase()) ?? null;
+    const token = tokens.find((item: RawOnmiTokenData) => item.address?.toLowerCase() === address.toLowerCase()) as RawOnmiTokenData | undefined;
+    if (!token) return null;
+    return { ...token, image: safeImageUrl(token.image) ?? safeImageUrl(token.uriData?.image) };
+  } catch {
+    return null;
+  }
+}
+
+function safeImageUrl(value: unknown) {
+  if (typeof value !== "string" || value.length > 500) return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
   } catch {
     return null;
   }
