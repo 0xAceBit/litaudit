@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, ArrowRight, Clock3, ExternalLink, FileCode2, Info, Radar, ShieldCheck, Terminal, Zap } from "lucide-react";
+import { ArrowRight, Clock3, ExternalLink, Info, Radar, Search, ShieldCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
