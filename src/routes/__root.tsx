@@ -37,6 +37,10 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "LitAudit" },
+      { name: "twitter:description", content: "Automated LitVM token contract risk analysis." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2c2beba2-0dc0-4a65-9f76-417e49f60dd2/id-preview-a3e561be--26757fd8-83be-48ff-adb3-f16a3b02a09b.lovable.app-1776862853197.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2c2beba2-0dc0-4a65-9f76-417e49f60dd2/id-preview-a3e561be--26757fd8-83be-48ff-adb3-f16a3b02a09b.lovable.app-1776862853197.png" },
     ],
     links: [
       {
