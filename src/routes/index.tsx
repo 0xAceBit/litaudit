@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Activity, ArrowRight, ExternalLink, FileCode2, Info, Radar, ShieldCheck, Terminal, Zap } from "lucide-react";
+import { Activity, ArrowRight, Clock3, ExternalLink, FileCode2, Info, Radar, ShieldCheck, Terminal, Zap } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +170,9 @@ function Index() {
 }
 
 function AuditPanel({ result, levelClassName, meterClassName }: { result: AuditResult; levelClassName: string; meterClassName: string }) {
+  const onmi = result.analysis.onmiData;
+  const creationTime = formatCreationTime(onmi?.blockTimestamp, onmi?.createdAt);
+
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -214,12 +217,15 @@ function AuditPanel({ result, levelClassName, meterClassName }: { result: AuditR
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {[
+          ["Created", creationTime],
           ["Bytecode", `${result.info.codeSize} bytes`],
           ["Decimals", String(result.info.decimals)],
           ["Owner", result.info.hasOwner ? "Detected" : "None"],
           ["Mint", result.info.hasMint ? "Present" : "None"],
           ["Pause", result.info.hasPause ? "Present" : "None"],
           ["Blacklist", result.info.hasBlacklist ? "Present" : "None"],
+          ["Onmi market cap", onmi?.marketCap ? `$${onmi.marketCap}` : "Not listed"],
+          ["Creator", onmi?.creatorAddress ? shortAddress(onmi.creatorAddress) : "Unknown"],
           ["Buy tax", `${result.analysis.gpData?.buy_tax ?? "0"}%`],
           ["Sell tax", `${result.analysis.gpData?.sell_tax ?? "0"}%`],
         ].map(([label, value]) => (
@@ -230,12 +236,23 @@ function AuditPanel({ result, levelClassName, meterClassName }: { result: AuditR
         ))}
       </div>
 
+      <div className="mt-6 flex gap-3 rounded-md border border-border bg-secondary p-4 text-sm leading-6 text-muted-foreground">
+        <Clock3 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+        <p>{onmi ? `Onmi launch data matched this token${onmi.txnHash ? ` from creation transaction ${shortAddress(onmi.txnHash)}.` : "."}` : "No matching Onmi launch record was found for this address yet."}</p>
+      </div>
+
       <div className="mt-6 flex gap-3 rounded-md border border-border bg-muted p-4 text-sm leading-6 text-muted-foreground">
         <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
         <p>This automated scan is not a formal audit. Treat it as a first-pass risk screen before deeper review.</p>
       </div>
     </div>
   );
+}
+
+function formatCreationTime(blockTimestamp?: string | null, createdAt?: string | null) {
+  const date = blockTimestamp ? new Date(Number(blockTimestamp) * 1000) : createdAt ? new Date(createdAt) : null;
+  if (!date || Number.isNaN(date.getTime())) return "Not listed";
+  return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 function InfoCard({ icon, title, copy }: { icon: React.ReactNode; title: string; copy: string }) {
