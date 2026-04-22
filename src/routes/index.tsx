@@ -32,12 +32,13 @@ function Index() {
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState<Array<{ address: string; level: RiskLevel }>>([]);
 
-  const parsedAddress = useMemo(() => contractAddressSchema.safeParse(address), [address]);
-  const canScan = parsedAddress.success && !loading;
+  const normalizedAddress = useMemo(() => normalizeAddressInput(address), [address]);
+  const parsedAddress = useMemo(() => contractAddressSchema.safeParse(normalizedAddress), [normalizedAddress]);
+  const canScan = normalizedAddress.length > 0 && !loading;
   const level = result ? riskMeta[result.analysis.level] : null;
 
   async function handleScan() {
-    const parsed = contractAddressSchema.safeParse(address);
+    const parsed = contractAddressSchema.safeParse(normalizedAddress);
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Enter a valid contract address");
       return;
@@ -94,7 +95,7 @@ function Index() {
                   <Search className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                   <Input
                     value={address}
-                    onChange={(event) => setAddress(event.target.value)}
+                    onChange={(event) => setAddress(normalizeAddressInput(event.target.value))}
                     onKeyDown={(event) => event.key === "Enter" && handleScan()}
                     placeholder="Enter contract address"
                     spellCheck={false}
@@ -108,7 +109,7 @@ function Index() {
                 </Button>
               </div>
               {error && <p className="mt-3 px-1 text-sm font-medium text-destructive">{error}</p>}
-              {address && !parsedAddress.success && !error && <p className="mt-3 px-1 text-sm text-muted-foreground">Use a 42-character address beginning with 0x.</p>}
+              {normalizedAddress && !parsedAddress.success && !error && <p className="mt-3 px-1 text-sm text-muted-foreground">Use a 42-character address beginning with 0x.</p>}
             </div>
           </div>
 
