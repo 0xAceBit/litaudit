@@ -3,6 +3,7 @@ import { z } from "zod";
 export const LITVM_RPC = "https://liteforge.rpc.caldera.xyz/http";
 export const LITVM_EXPLORER = "https://liteforge.explorer.caldera.xyz";
 export const LITVM_CHAIN_ID = "4441";
+export const ONMI_TOKEN_API = "https://api.onmi.fun/api/tokens/getToken";
 
 export const contractAddressSchema = z
   .string()
@@ -32,12 +33,26 @@ export type TokenInfo = {
 
 export type GoPlusTokenData = Record<string, string | undefined>;
 
+export type OnmiTokenData = {
+  address: string;
+  blockNumber?: number | string | null;
+  blockTimestamp?: string | null;
+  createdAt?: string | null;
+  creatorAddress?: string | null;
+  image?: string | null;
+  marketCap?: string | number | null;
+  name?: string | null;
+  symbol?: string | null;
+  txnHash?: string | null;
+};
+
 export type AuditResult = {
   address: string;
   analysis: {
     flags: Finding[];
     gpData: GoPlusTokenData | null;
     level: RiskLevel;
+    onmiData: OnmiTokenData | null;
     score: number;
   };
   info: TokenInfo;
