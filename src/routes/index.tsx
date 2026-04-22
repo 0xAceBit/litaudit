@@ -256,6 +256,10 @@ function formatCreationTime(blockTimestamp?: string | null, createdAt?: string |
   return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
+function normalizeAddressInput(value: string) {
+  return value.trim().replace(/\s+/g, "");
+}
+
 function InfoCard({ icon, title, copy }: { icon: React.ReactNode; title: string; copy: string }) {
   return (
     <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
