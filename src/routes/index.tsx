@@ -24,10 +24,6 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-function normalizeAddressInput(value: string) {
-  return value.trim().replace(/\s+/g, "");
-}
-
 function Index() {
   const scan = useServerFn(scanContract);
   const [address, setAddress] = useState("");
@@ -36,9 +32,9 @@ function Index() {
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState<Array<{ address: string; level: RiskLevel }>>([]);
 
-  const normalizedAddress = useMemo(() => normalizeAddressInput(address), [address]);
+  const normalizedAddress = address.trim().replace(/\s+/g, "");
   const parsedAddress = useMemo(() => contractAddressSchema.safeParse(normalizedAddress), [normalizedAddress]);
-  const canScan = normalizedAddress.length > 0 && !loading;
+  const canScan = !loading && normalizedAddress.length > 0;
   const level = result ? riskMeta[result.analysis.level] : null;
 
   async function handleScan() {
@@ -99,7 +95,7 @@ function Index() {
                   <Search className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                   <Input
                     value={address}
-                    onChange={(event) => setAddress(normalizeAddressInput(event.target.value))}
+                    onChange={(event) => setAddress(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && handleScan()}
                     placeholder="Enter contract address"
                     spellCheck={false}
@@ -107,7 +103,7 @@ function Index() {
                     aria-label="LitVM contract address"
                   />
                 </div>
-                <Button className="h-14 rounded-md px-7 text-sm font-black" disabled={!canScan} onClick={handleScan}>
+                <Button className="h-14 rounded-md px-7 text-sm font-black" disabled={!canScan} onClick={handleScan} type="button">
                   {loading ? "Analyzing" : "Scan Contract"}
                   {loading ? <Radar className="size-4 animate-spin" aria-hidden="true" /> : <ArrowRight className="size-4" aria-hidden="true" />}
                 </Button>
