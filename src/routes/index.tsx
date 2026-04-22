@@ -58,51 +58,51 @@ function Index() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <header className="border-b border-border/70 bg-card/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+      <header className="border-b border-border/70 bg-card/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5 sm:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg border border-primary/30 bg-primary/10 text-primary shadow-[var(--shadow-signal)]">
-              <ShieldCheck className="size-5" aria-hidden="true" />
+            <div className="flex size-9 items-center justify-center rounded-md border border-primary/40 bg-primary/10 text-primary shadow-[var(--shadow-signal)]">
+              <ShieldCheck className="size-4" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-lg font-semibold leading-tight tracking-normal">LitAudit</p>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">LitVM Security Intel</p>
+              <p className="text-xl font-bold leading-tight tracking-normal text-primary">LitAudit</p>
+              <p className="text-xs font-semibold text-muted-foreground">Security Intelligence for LitVM</p>
             </div>
           </div>
-          <a className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent" href={LITVM_EXPLORER} target="_blank" rel="noreferrer">
+          <a className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-4 py-2.5 text-sm font-bold text-secondary-foreground transition-colors hover:bg-accent" href={LITVM_EXPLORER} target="_blank" rel="noreferrer">
             Explorer <ExternalLink className="size-4" aria-hidden="true" />
           </a>
         </div>
       </header>
 
-      <section className="relative border-b border-border/70 bg-[radial-gradient(ellipse_at_top,var(--scanner-glow),transparent_58%)]">
-        <div className="mx-auto grid min-h-[calc(100vh-73px)] max-w-7xl items-center gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:py-16">
-          <div className="max-w-3xl">
-            <Badge className="mb-6 border-primary/30 bg-primary/10 px-3 py-1 text-primary hover:bg-primary/10">
-              <Activity className="mr-2 size-3.5" aria-hidden="true" /> LitVM Testnet · Chain 4441
+      <section className="relative border-b border-border/70 bg-[radial-gradient(ellipse_at_top,var(--scanner-glow),transparent_60%)]">
+        <div className="mx-auto flex min-h-[calc(100vh-82px)] max-w-7xl flex-col items-center px-6 py-24 text-center sm:px-8 lg:py-28">
+          <div className="mx-auto max-w-5xl">
+            <Badge className="mb-7 rounded-full border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase text-primary hover:bg-primary/10">
+              LitVM Testnet · Chain 4441
             </Badge>
-            <h1 className="max-w-3xl text-5xl font-black leading-[0.95] tracking-normal text-foreground sm:text-6xl lg:text-7xl">
-              Token contract risk scanner for LitVM.
+            <h1 className="mx-auto max-w-3xl text-5xl font-black leading-[1.04] tracking-normal text-foreground sm:text-6xl lg:text-7xl">
+              Token security, <span className="bg-gradient-to-r from-primary via-audit-info to-audit-medium bg-clip-text text-transparent">redefined.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-              Analyze deployed token contracts for honeypot signals, privileged functions, tax risk, proxy patterns, and suspicious bytecode before interacting with them.
+            <p className="mx-auto mt-7 max-w-3xl text-base font-medium leading-8 text-muted-foreground sm:text-lg">
+              Advanced contract analysis for the LitVM ecosystem. Detect honeypots, rugpull vectors, and hidden vulnerabilities before they cost you.
             </p>
 
-            <div className="mt-8 max-w-3xl rounded-lg border border-border bg-card p-3 shadow-[var(--shadow-panel)]">
+            <div className="mx-auto mt-12 max-w-5xl rounded-xl border border-border bg-card/95 p-3 shadow-[var(--shadow-panel)]">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
-                  <Terminal className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Search className="pointer-events-none absolute left-5 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                   <Input
                     value={address}
                     onChange={(event) => setAddress(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && handleScan()}
-                    placeholder="0x… contract address"
+                    placeholder="Enter contract address"
                     spellCheck={false}
-                    className="h-12 border-border bg-secondary pl-10 font-mono text-sm"
+                    className="h-14 border-0 bg-secondary pl-14 text-left font-mono text-sm font-semibold shadow-none focus-visible:ring-1 focus-visible:ring-primary"
                     aria-label="LitVM contract address"
                   />
                 </div>
-                <Button className="h-12 rounded-md px-5" disabled={!canScan} onClick={handleScan}>
+                <Button className="h-14 rounded-md px-7 text-sm font-black" disabled={!canScan} onClick={handleScan}>
                   {loading ? "Analyzing" : "Scan Contract"}
                   {loading ? <Radar className="size-4 animate-spin" aria-hidden="true" /> : <ArrowRight className="size-4" aria-hidden="true" />}
                 </Button>
@@ -112,7 +112,7 @@ function Index() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-border bg-card p-5 shadow-[var(--shadow-panel)] lg:p-6">
+          <div className="mt-12 w-full max-w-5xl rounded-lg border border-border bg-card p-5 text-left shadow-[var(--shadow-panel)] lg:p-6">
             {!result ? (
               <div className="flex min-h-[420px] flex-col justify-between gap-8">
                 <div>
