@@ -24,6 +24,10 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+function normalizeAddressInput(value: string) {
+  return value.trim().replace(/\s+/g, "");
+}
+
 function Index() {
   const scan = useServerFn(scanContract);
   const [address, setAddress] = useState("");
@@ -254,10 +258,6 @@ function formatCreationTime(blockTimestamp?: string | null, createdAt?: string |
   const date = blockTimestamp ? new Date(Number(blockTimestamp) * 1000) : createdAt ? new Date(createdAt) : null;
   if (!date || Number.isNaN(date.getTime())) return "Not listed";
   return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-}
-
-function normalizeAddressInput(value: string) {
-  return value.trim().replace(/\s+/g, "");
 }
 
 function InfoCard({ icon, title, copy }: { icon: React.ReactNode; title: string; copy: string }) {
