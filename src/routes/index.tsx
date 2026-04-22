@@ -173,14 +173,25 @@ function Index() {
 function AuditPanel({ result, levelClassName, meterClassName }: { result: AuditResult; levelClassName: string; meterClassName: string }) {
   const onmi = result.analysis.onmiData;
   const creationTime = formatCreationTime(onmi?.blockTimestamp, onmi?.createdAt);
+  const tokenName = onmi?.name ?? result.info.name ?? "Token";
+  const tokenSymbol = onmi?.symbol ?? result.info.symbol;
 
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Contract address</p>
-          <p className="mt-2 font-mono text-sm text-foreground">{shortAddress(result.address)}</p>
-          {(result.info.symbol || result.info.name) && <p className="mt-2 text-lg font-bold">{result.info.symbol ?? "Token"} <span className="text-sm font-medium text-muted-foreground">{result.info.name}</span></p>}
+        <div className="flex min-w-0 items-center gap-4">
+          {onmi?.image ? (
+            <img src={onmi.image} alt={`${tokenName} token logo`} className="size-16 shrink-0 rounded-xl border border-border bg-secondary object-cover" loading="lazy" referrerPolicy="no-referrer" />
+          ) : (
+            <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary">
+              <ShieldCheck className="size-7" aria-hidden="true" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Contract address</p>
+            <p className="mt-2 font-mono text-sm text-foreground">{shortAddress(result.address)}</p>
+            <p className="mt-2 truncate text-lg font-bold">{tokenSymbol ?? "Token"} <span className="text-sm font-medium text-muted-foreground">{tokenName}</span></p>
+          </div>
         </div>
         <a className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-2 text-sm font-medium hover:bg-accent" href={`${LITVM_EXPLORER}/address/${result.address}`} target="_blank" rel="noreferrer">
           View <ExternalLink className="size-4" />
