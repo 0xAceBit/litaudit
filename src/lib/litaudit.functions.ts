@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader, getRequestIP, setResponseHeader, setResponseStatus } from "@tanstack/react-start/server";
 
 import {
   LITVM_CHAIN_ID,
@@ -23,6 +24,18 @@ const ERC20_SELECTORS = {
   pauseFunc: "0x8456cb59",
   blacklist: "0x44337ea1",
 };
+
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 60;
+const RATE_LIMIT_BURST = 20;
+
+type RateLimitBucket = {
+  burstTokens: number;
+  requestCount: number;
+  resetAt: number;
+};
+
+const rateLimitBuckets = new Map<string, RateLimitBucket>();
 
 type RawOnmiTokenData = OnmiTokenData & {
   uriData?: {
@@ -138,6 +151,46 @@ function safeImageUrl(value: unknown) {
   }
 }
 
+function getRequesterKey() {
+  const authHeader = getRequestHeader("authorization") || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  const userId = getJwtSubject(token);
+  const ip = getRequestIP({ xForwardedFor: true }) || getRequestHeader("cf-connecting-ip") || getRequestHeader("x-forwarded-for") || "unknown";
+
+  return userId ? `user:${userId}` : `ip:${ip.split(",")[0].trim()}`;
+}
+
+function getJwtSubject(token: string) {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(Buffer.from(normalized, "base64").toString("utf8"));
+    return typeof decoded.sub === "string" && decoded.sub.length > 0 ? decoded.sub : null;
+  } catch {
+    return null;
+  }
+}
+
+function enforceRateLimit() {
+  const now = Date.now();
+  const key = getRequesterKey();
+  const existing = rateLimitBuckets.get(key);
+  const bucket = existing && existing.resetAt > now ? existing : { burstTokens: RATE_LIMIT_BURST, requestCount: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+
+  if (bucket.requestCount >= RATE_LIMIT_MAX_REQUESTS || bucket.burstTokens <= 0) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+    rateLimitBuckets.set(key, bucket);
+    setResponseStatus(429);
+    setResponseHeader("Retry-After", String(retryAfterSeconds));
+    throw new Error(`Too many scan requests. Please try again in ${retryAfterSeconds} seconds.`);
+  }
+
+  bucket.requestCount += 1;
+  bucket.burstTokens -= 1;
+  rateLimitBuckets.set(key, bucket);
+}
+
 function analyzeRisk(info: TokenInfo, gpData: GoPlusTokenData | null, onmiData: OnmiTokenData | null) {
   const flags: Finding[] = [];
   let score = 0;
@@ -190,6 +243,7 @@ function analyzeRisk(info: TokenInfo, gpData: GoPlusTokenData | null, onmiData: 
 export const scanContract = createServerFn({ method: "POST" })
   .inputValidator((input) => ({ address: contractAddressSchema.parse((input as { address?: unknown }).address) }))
   .handler(async ({ data }): Promise<AuditResult> => {
+    enforceRateLimit();
     const info = await fetchTokenInfo(data.address);
     const [gpData, onmiData] = await Promise.all([tryGoPlusCheck(data.address), tryOnmiTokenData(data.address)]);
     const analysis = analyzeRisk(info, gpData, onmiData);
