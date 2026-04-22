@@ -3,10 +3,12 @@ import { createServerFn } from "@tanstack/react-start";
 import {
   LITVM_CHAIN_ID,
   LITVM_RPC,
+  ONMI_TOKEN_API,
   contractAddressSchema,
   type AuditResult,
   type Finding,
   type GoPlusTokenData,
+  type OnmiTokenData,
   type RiskLevel,
   type TokenInfo,
 } from "@/lib/litaudit";
@@ -105,12 +107,25 @@ async function tryGoPlusCheck(address: string) {
   }
 }
 
-function analyzeRisk(info: TokenInfo, gpData: GoPlusTokenData | null) {
+async function tryOnmiTokenData(address: string): Promise<OnmiTokenData | null> {
+  try {
+    const params = new URLSearchParams({ chainId: LITVM_CHAIN_ID, limit: "1", page: "1", search: address });
+    const response = await fetch(`${ONMI_TOKEN_API}?${params.toString()}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    const tokens = Array.isArray(data.token) ? data.token : [];
+    return tokens.find((token: OnmiTokenData) => token.address?.toLowerCase() === address.toLowerCase()) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function analyzeRisk(info: TokenInfo, gpData: GoPlusTokenData | null, onmiData: OnmiTokenData | null) {
   const flags: Finding[] = [];
   let score = 0;
 
   if (!info.isContract) {
-    return { score: 0, level: "unknown" as RiskLevel, flags: [{ sev: "info" as const, msg: "This address is not a contract — it appears to be a wallet." }], gpData: null };
+    return { score: 0, level: "unknown" as RiskLevel, flags: [{ sev: "info" as const, msg: "This address is not a contract — it appears to be a wallet." }], gpData: null, onmiData };
   }
 
   if (info.codeSize < 50) {
@@ -151,14 +166,14 @@ function analyzeRisk(info: TokenInfo, gpData: GoPlusTokenData | null) {
 
   score = Math.min(score, 100);
   const level: RiskLevel = score >= 60 ? "high" : score >= 30 ? "medium" : "low";
-  return { score, level, flags, gpData };
+  return { score, level, flags, gpData, onmiData };
 }
 
 export const scanContract = createServerFn({ method: "POST" })
   .inputValidator((input) => ({ address: contractAddressSchema.parse((input as { address?: unknown }).address) }))
   .handler(async ({ data }): Promise<AuditResult> => {
     const info = await fetchTokenInfo(data.address);
-    const gpData = await tryGoPlusCheck(data.address);
-    const analysis = analyzeRisk(info, gpData);
+    const [gpData, onmiData] = await Promise.all([tryGoPlusCheck(data.address), tryOnmiTokenData(data.address)]);
+    const analysis = analyzeRisk(info, gpData, onmiData);
     return { address: data.address, analysis, info, scannedAt: new Date().toISOString() };
   });
